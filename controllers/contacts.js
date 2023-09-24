@@ -1,18 +1,13 @@
 const contacts = require("../models/contacts");
-const { HttpError } = require("../utils");
+const { HttpError, ctrlWrapper } = require("../utils");
 
 
-const getAllContacts = async (req, res, next) => {
-  try {
+const getAllContacts = ctrlWrapper(async (req, res, next) => {
     const result = await contacts.listContacts();
     res.status(200).json(result);
-  } catch (error) {
-    next(error);
-  }
-};
+});
 
-const getContactById = async (req, res, next) => {
-  try {
+const getContactById = ctrlWrapper(async (req, res, next) => {
     const { contactId } = req.params;
     const result = await contacts.getContactById(contactId);
 
@@ -20,28 +15,15 @@ const getContactById = async (req, res, next) => {
       throw HttpError(404, "Not found");
     }
     res.status(200).json(result);
-  } catch (error) {
-    next(error);
-  }
-};
+});
 
-const addContact = async (req, res, next) => {
-  try {
-    // const { error } = addSchema.validate(req.body);
-
-    // if (error) {
-    //   throw HttpError(400, error.message);
-    // }
-
+const addContact = ctrlWrapper(async (req, res, next) => {
     const result = await contacts.addContact(req.body);
     res.status(201).json(result);
-  } catch (error) {
-    next(error);
-  }
-};
 
-const delContactById = async (req, res, next) => {
-  try {
+});
+
+const delContactById = ctrlWrapper(async (req, res, next) => {
     const { contactId } = req.params;
     const result = await contacts.removeContact(contactId);
 
@@ -50,20 +32,10 @@ const delContactById = async (req, res, next) => {
     }
 
     res.status(201).json({ message: "contact deleted" });
-  } catch (error) {
-    next(error);
-  }
-};
+});
 
-const updateContactById = async (req, res, next) => {
-  try {
-    // const { error } = addSchema.validate(req.body);
-
-    // if (error) {
-    //   throw HttpError(400, error.message);
-    // }
+const updateContactById = ctrlWrapper(async (req, res, next) => {
     const { contactId } = req.params;
-    console.log(contactId)
     const result = await contacts.editContact(
       contactId,
       req.body
@@ -73,10 +45,7 @@ const updateContactById = async (req, res, next) => {
       throw HttpError(404, "Not found");
     }
     res.status(200).json(result);
-  } catch (error) {
-    next(error);
-  }
-};
+});
 
 module.exports = {
   getAllContacts,
