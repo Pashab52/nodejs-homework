@@ -19,7 +19,6 @@ app.use((req, res) => {
   res.status(404).json({ message: 'Not found' })
 })
 
-// я розумію, що код має бути чистий, я коментую деякі частини коду, який можна зробити іншим способом, я так краще запам’ятовую. 
 // app.all('*', (req, res) => {
 //   res.status(404).json({ message: 'Not found' })
 // })
