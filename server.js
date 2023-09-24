@@ -1,9 +1,20 @@
-const app = require('./app')
+const app = require("./app");
+const mongoose = require("mongoose");
 
-const {port=3000} = process.env;
+const { PORT = 3000, MONGO_URL } = process.env;
 
-
-app.listen(port, () => {
-  console.log(`Server is up and running on port: ${port}`);
-});
-
+mongoose
+  .connect(MONGO_URL)
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`======================================
+Database connection successful
+======================================
+Server is up and running on port: ${PORT}
+======================================`);
+    });
+  })
+  .catch((error) => {
+    console.log(error.message);
+    process.exit(1);
+  });

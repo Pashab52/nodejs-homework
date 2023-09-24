@@ -19,11 +19,11 @@ router
   .get(ctrl.getAllContacts)
   .post(validateContactBody(schemas.addSchema), ctrl.addContact);
 
-router
-  .route("/:contactId")
-  .get(ctrl.getContactById)
-  .put(validateContactBody(schemas.addSchema), ctrl.updateContactById)
-  .delete(ctrl.delContactById);
+// router
+//   .route("/:contactId")
+//   .get(ctrl.getContactById)
+//   .put(validateContactBody(schemas.addSchema), ctrl.updateContactById)
+//   .delete(ctrl.delContactById);
 
 
 module.exports = router
