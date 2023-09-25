@@ -4,19 +4,18 @@ const { HttpError, ctrlWrapper } = require("../utils");
 
 const getAllContacts = async (req, res) => {
   const result = await Contact.find();
-  // console.table(result);
     res.status(200).json(result);
 };
 
-// const getContactById = ctrlWrapper(async (req, res, next) => {
-//     const { contactId } = req.params;
-//     const result = await contacts.getContactById(contactId);
+const getContactById = ctrlWrapper(async (req, res, next) => {
+    const { contactId } = req.params;
+    const result = await Contact.findById(contactId);
 
-//     if (!result) {
-//       throw HttpError(404, "Not found");
-//     }
-//     res.status(200).json(result);
-// });
+    if (!result) {
+      throw HttpError(404, "Not found");
+    }
+    res.status(200).json(result);
+});
 
 const addContact = ctrlWrapper(async (req, res, next) => {
     const result = await Contact.create(req.body);
@@ -24,34 +23,55 @@ const addContact = ctrlWrapper(async (req, res, next) => {
 
 });
 
-// const delContactById = ctrlWrapper(async (req, res, next) => {
-//     const { contactId } = req.params;
-//     const result = await contacts.removeContact(contactId);
+const delContactById = ctrlWrapper(async (req, res, next) => {
+    const { contactId } = req.params;
+    const result = await Contact.findByIdAndDelete (contactId);
 
-//     if (!result) {
-//       throw HttpError(404, "Not found");
-//     }
+    if (!result) {
+      throw HttpError(404, "Not found");
+    }
 
-//     res.status(201).json({ message: "contact deleted" });
-// });
+    res.status(201).json({ message: "contact deleted" });
+});
 
-// const updateContactById = ctrlWrapper(async (req, res, next) => {
-//     const { contactId } = req.params;
-//     const result = await contacts.editContact(
-//       contactId,
-//       req.body
-//     );
+const updateContactById = ctrlWrapper(async (req, res, next) => {
+    const { contactId } = req.params;
+    const result = await Contact.findByIdAndUpdate(
+      contactId,
+      req.body,
+      { new: true }
+    );
     
-//     if (!result) {
-//       throw HttpError(404, "Not found");
-//     }
-//     res.status(200).json(result);
-// });
+    if (!result) {
+      throw HttpError(404, "Not found");
+    }
+    res.status(200).json(result);
+});
+
+const updateFavorite = ctrlWrapper(
+  async (req, res, next) => {
+    // if (!req.body) {
+    //   throw HttpError(400, "missing field favorite");
+    // }
+    const { contactId } = req.params;
+    const result = await Contact.findByIdAndUpdate(
+      contactId,
+      req.body,
+      { new: true }
+    );
+
+    if (!result) {
+      throw HttpError(404, "Not found");
+    }
+    res.status(200).json(result);
+  }
+);
 
 module.exports = {
   getAllContacts,
-  // getContactById,
+  getContactById,
   addContact,
-  // delContactById,
-  // updateContactById,
+  delContactById,
+  updateContactById,
+  updateFavorite,
 };
