@@ -49,9 +49,6 @@ const updateContactById = ctrlWrapper(async (req, res, next) => {
 
 const updateFavorite = ctrlWrapper(
   async (req, res, next) => {
-    // if (!req.body) {
-    //   throw HttpError(400, "missing field favorite");
-    // }
     const { contactId } = req.params;
     const result = await Contact.findByIdAndUpdate(
       contactId,

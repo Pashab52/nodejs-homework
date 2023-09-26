@@ -7,16 +7,6 @@ const {
 } = require("../../middlewares");
 const schemas = require("../../schemas/contactSchema");
 
-// router.get('/', ctrl.getAllContacts);
-
-// router.post('/', ctrl.addContact);
-
-// router.get('/:contactId', ctrl.getContactById);
-
-// router.delete('/:contactId', ctrl.delContactById);
-
-// router.put('/:contactId', ctrl.updateContactById)
-
 router
   .route("/")
   .get(ctrl.getAllContacts)
