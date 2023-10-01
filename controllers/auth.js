@@ -28,7 +28,7 @@ const loginUser = ctrlWrapper(async (req, res) => {
     const result = await User.findOne({email});
 
     if (!result) {
-        throw HttpError(410, "Email or password is wrong");
+        throw HttpError(401, "Email or password is wrong");
     }
     const passwordCompare = await bcrypt.compare(password, result.password);
 
@@ -38,7 +38,9 @@ const loginUser = ctrlWrapper(async (req, res) => {
 
     const payload = { id: result._id}
 
-    const token = jwt.sign(payload, SECRET_KEY, {expiresIn: '23h'})
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '23h' })
+
+    await User.findByIdAndUpdate(result._id, { token });
 
     res.status(200).json({
       token,

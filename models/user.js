@@ -8,6 +8,7 @@ const userSchema = new Schema(
   {
     password: {
       type: String,
+      minlength: 6,
       required: [true, "Set password for user"],
     },
     email: {
@@ -21,7 +22,9 @@ const userSchema = new Schema(
       enum: subscriptionTypes,
       default: "starter",
     },
-    token: String,
+    token: {
+      type: String,
+    default: ""}
   },
   { versionKey: false, timestamps: true }
 );
