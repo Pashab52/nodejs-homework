@@ -5,6 +5,7 @@ const {
   validateContactBody,
   isValidContactId,
 } = require("../../middlewares");
+
 const schemas = require("../../schemas/contactSchema");
 
 router

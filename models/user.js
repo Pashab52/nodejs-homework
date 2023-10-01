@@ -14,7 +14,7 @@ const userSchema = new Schema(
       type: String,
       match: emailRegexp,
       required: [true, "Email is required"],
-      unique: true,
+      unique: [true, "Email in use"],
     },
     subscription: {
       type: String,
@@ -30,8 +30,7 @@ const userRegisterSchema = Joi.object({
   password: Joi.string().min(6).max(30).required(),
   email: Joi.string().pattern(emailRegexp).required(),
   subscription: Joi.string()
-    .valid(...subscriptionTypes)
-    .required(),
+    .valid(...subscriptionTypes),
 }).options({ abortEarly: false });
 
 const userLoginSchema = Joi.object({
@@ -39,7 +38,7 @@ const userLoginSchema = Joi.object({
   email: Joi.string().pattern(emailRegexp).required(),
 }).options({ abortEarly: false });
 
-module.exports = {
+const schemas = {
   userRegisterSchema,
   userLoginSchema,
 };
@@ -50,10 +49,14 @@ userSchema.post("save", (error, data, next) => {
     name === "MongoServerError" && code === 11000
       ? 409
       : 400;
-  error.status = status;
+  if (name === "MongoServerError" && code === 11000) {
+    error.message = "Email in use";
+  }
+   error.status = status;
+
   next();
 });
 
 const User = model("user", userSchema);
 
-module.exports = User;
+module.exports = {User, schemas};
