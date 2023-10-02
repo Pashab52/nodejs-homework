@@ -3,7 +3,8 @@ const { HttpError, ctrlWrapper } = require("../utils");
 
 
 const getAllContacts = async (req, res) => {
-  const result = await Contact.find();
+ const { id: owner } = req.user;
+  const result = await Contact.find({owner});
     res.status(200).json(result);
 };
 
@@ -18,7 +19,8 @@ const getContactById = ctrlWrapper(async (req, res, next) => {
 });
 
 const addContact = ctrlWrapper(async (req, res, next) => {
-    const result = await Contact.create(req.body);
+    const { id: owner } = req.user;
+    const result = await Contact.create({...req.body, owner});
     res.status(201).json(result);
 });
 
@@ -29,7 +31,6 @@ const delContactById = ctrlWrapper(async (req, res, next) => {
     if (!result) {
       throw HttpError(404, "Not found");
     }
-
     res.status(201).json({ message: "contact deleted" });
 });
 
@@ -40,7 +41,6 @@ const updateContactById = ctrlWrapper(async (req, res, next) => {
       req.body,
       { new: true }
     );
-    
     if (!result) {
       throw HttpError(404, "Not found");
     }

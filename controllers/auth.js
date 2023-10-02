@@ -39,7 +39,11 @@ const loginUser = ctrlWrapper(async (req, res) => {
 
   const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '23h' })
 
-  await User.findByIdAndUpdate(result._id, { token });
+  await User.findByIdAndUpdate(
+    result._id,
+    { token },
+    // { new: true }
+  );
 
   res.status(200).json({
     token,
@@ -51,7 +55,6 @@ const loginUser = ctrlWrapper(async (req, res) => {
 }
 );
 
-
 const logoutUser = ctrlWrapper(async (req, res) => {
   const { id } = req.user;
 
@@ -60,11 +63,18 @@ const logoutUser = ctrlWrapper(async (req, res) => {
   res.sendStatus(204);
 });
 
-
+const currentUser = ctrlWrapper(async (req, res) => {
+ const { email, subscription } = req.user;
+  res.status(200).json({
+    email,
+    subscription,
+  });
+});
 
 
 module.exports = {
   registerUser,
   loginUser,
   logoutUser,
+  currentUser,
 };
