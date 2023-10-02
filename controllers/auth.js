@@ -19,43 +19,52 @@ const registerUser = ctrlWrapper(async (req, res) => {
         subscription: result.subscription,
       },
     });
-    
 })
 
 const loginUser = ctrlWrapper(async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    const result = await User.findOne({email});
+  const result = await User.findOne({ email });
 
-    if (!result) {
-        throw HttpError(401, "Email or password is wrong");
-    }
-    const passwordCompare = await bcrypt.compare(password, result.password);
+  if (!result) {
+    throw HttpError(401, "Email or password is wrong");
+  }
+  const passwordCompare = await bcrypt.compare(password, result.password);
 
-    if (!passwordCompare) {
-         throw HttpError(401, "Email or password is wrong");
-    }
+  if (!passwordCompare) {
+    throw HttpError(401, "Email or password is wrong");
+  }
 
-    const payload = { id: result._id}
+  const payload = { id: result._id }
 
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '23h' })
+  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '23h' })
 
-    await User.findByIdAndUpdate(result._id, { token });
+  await User.findByIdAndUpdate(result._id, { token });
 
-    res.status(200).json({
-      token,
-      user: {
-        email: result.email,
-        subscription: result.subscription,
-      },
-    });
+  res.status(200).json({
+    token,
+    user: {
+      email: result.email,
+      subscription: result.subscription,
+    },
+  });
+}
+);
 
-    }
-)
+
+const logoutUser = ctrlWrapper(async (req, res) => {
+  const { id } = req.user;
+
+  await User.findByIdAndUpdate(id, { token: "" });
+
+  res.sendStatus(204);
+});
+
 
 
 
 module.exports = {
   registerUser,
-  loginUser
+  loginUser,
+  logoutUser,
 };
