@@ -1,19 +1,22 @@
 const { User } = require("../models/user");
-const { ctrlWrapper } = require("../utils");
+const { ctrlWrapper, HttpError } = require("../utils");
 
+const updateSubscription = ctrlWrapper(async (req, res) => {
+  const { id, email } = req.user;
+  const { subscription } = req.body;
 
-const updateSubscription = ctrlWrapper(async(req, res) => {
-    const { id, email } = req.user;
-    const { subscription } = req.body;
-
-    await User.findByIdAndUpdate(id, { subscription });
-
-    res.status(200).json({
-      email,
-      subscription,
-    });
-})
+  const result = await User.findByIdAndUpdate(id, {
+    subscription,
+  });
+  if (!result) {
+    throw HttpError(404, "Not found");
+  }
+  res.status(200).json({
+    email,
+    subscription,
+  });
+});
 
 module.exports = {
-    updateSubscription
-}
+  updateSubscription,
+};
