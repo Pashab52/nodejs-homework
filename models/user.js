@@ -2,7 +2,8 @@ const { Schema, model } = require("mongoose");
 const Joi = require("joi");
 
 const subscriptionTypes = ["starter", "pro", "business"];
-const emailRegexp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+const emailRegexp =
+  /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
 const userSchema = new Schema(
   {
@@ -36,8 +37,7 @@ const userSchema = new Schema(
 const userRegisterSchema = Joi.object({
   password: Joi.string().min(6).max(30).required(),
   email: Joi.string().pattern(emailRegexp).required(),
-  subscription: Joi.string()
-    .valid(...subscriptionTypes),
+  subscription: Joi.string().valid(...subscriptionTypes),
 }).options({ abortEarly: false });
 
 const userLoginSchema = Joi.object({
@@ -46,13 +46,17 @@ const userLoginSchema = Joi.object({
 }).options({ abortEarly: false });
 
 const userChangeSubscriptionSchema = Joi.object({
-  subscription: Joi.string().valid(...subscriptionTypes).required(),
+  subscription: Joi.string()
+    .valid(...subscriptionTypes)
+    .required(),
 }).options({ abortEarly: false });
+
+
 
 const schemas = {
   userRegisterSchema,
   userLoginSchema,
-  userChangeSubscriptionSchema
+  userChangeSubscriptionSchema,
 };
 
 userSchema.post("save", (error, data, next) => {
@@ -64,11 +68,11 @@ userSchema.post("save", (error, data, next) => {
   if (name === "MongoServerError" && code === 11000) {
     error.message = "Email in use";
   }
-   error.status = status;
+  error.status = status;
 
   next();
 });
 
 const User = model("user", userSchema);
 
-module.exports = {User, schemas};
+module.exports = { User, schemas };

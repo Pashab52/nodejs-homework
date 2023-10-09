@@ -5,11 +5,13 @@ const { PORT = 3000, MONGO_URL } = process.env;
 
 mongoose
   .connect(MONGO_URL)
+  .then(
+    console.log(`======================================
+Database connection successful
+======================================`))
   .then(() => {
     app.listen(PORT, () => {
       console.log(`======================================
-Database connection successful
-======================================
 Server is up and running on port: ${PORT}
 ======================================`);
     });
