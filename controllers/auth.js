@@ -1,22 +1,30 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const gravatar = require("gravatar");
 const { User } = require("../models/user");
 const { HttpError, ctrlWrapper } = require("../utils");
 
 const { SECRET_KEY } = process.env;
 
 const registerUser = ctrlWrapper(async (req, res) => {
-    const { password } = req.body;
+    const { password, email } = req.body;
 
     const hashPass = await bcrypt.hash(password, 10)
 
-    const result = await User.create({...req.body, password: hashPass});
+    const defAvatar = gravatar.url(email);
+  
+    const result = await User.create({
+      ...req.body,
+      password: hashPass,
+      avatarURL: defAvatar,
+    });
     
     res.status(201).json({
       user: {
         email: result.email,
         subscription: result.subscription,
+        avatarURL: result.avatarURL,
       },
     });
 })
