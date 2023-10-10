@@ -1,11 +1,18 @@
 const { User } = require("../models/user");
-const { ctrlWrapper, HttpError } = require("../utils");
+const {
+  ctrlWrapper,
+  HttpError,
+  fileResize,
+} = require("../utils");
 const path = require("path");
-const fs = require("fs/promises")
+const fs = require("fs/promises");
 
-const Jimp = require("jimp");
-
-const avatarsDir = path.join(__dirname, "../", "public", "avatars");
+const avatarsDir = path.join(
+  __dirname,
+  "../",
+  "public",
+  "avatars"
+);
 
 const updateSubscription = ctrlWrapper(async (req, res) => {
   const { id, email } = req.user;
@@ -23,28 +30,26 @@ const updateSubscription = ctrlWrapper(async (req, res) => {
   });
 });
 
-// https://github.com/HakuMatsunoki/node_course05/blob/master/09/services/imageService.js
-
 const updateAvatar = ctrlWrapper(async (req, res) => {
+  if (!req.file) {
+    throw HttpError(400, "Bad request");
+  }
+
   const { path: tmpUpload, originalname } = req.file;
-  console.log(req.file)
-  
- await Jimp.read(tmpUpload)
-   .then((image) => {
-     return image
-       .resize(250, 250) 
-       .write(tmpUpload); 
-   })
-   .catch((err) => {
-     console.error(err);
-   });
 
-  const resultUpload = path.join(avatarsDir, originalname);
-  await fs.rename(tmpUpload, resultUpload)
-
-  const avatarURL = path.join("avatars", originalname)
+  await fileResize(tmpUpload);
 
   const { id } = req.user;
+
+  const uniqueFileName = `${id}_${originalname}`;
+  const resultUpload = path.join(
+    avatarsDir,
+    uniqueFileName
+  );
+  await fs.rename(tmpUpload, resultUpload);
+
+  const avatarURL = path.join("avatars", uniqueFileName);
+
   const result = await User.findByIdAndUpdate(id, {
     avatarURL,
   });
@@ -52,14 +57,11 @@ const updateAvatar = ctrlWrapper(async (req, res) => {
     throw HttpError(404, "Not found");
   }
   res.status(200).json({
-    avatarURL
+    avatarURL,
   });
-
-})
-
-
+});
 
 module.exports = {
   updateSubscription,
-  updateAvatar
+  updateAvatar,
 };
