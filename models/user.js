@@ -51,8 +51,6 @@ const userChangeSubscriptionSchema = Joi.object({
     .required(),
 }).options({ abortEarly: false });
 
-
-
 const schemas = {
   userRegisterSchema,
   userLoginSchema,
