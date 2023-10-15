@@ -28,4 +28,8 @@ router.post(
 
 router.get("/current", authenticate, ctrl.currentUser);
 
+
+
+// GET /auth/verify/:verificationToken
+
 module.exports = router;

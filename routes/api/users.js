@@ -22,5 +22,4 @@ router.patch(
   ctrl.updateAvatar
 );
 
-
 module.exports = router;
