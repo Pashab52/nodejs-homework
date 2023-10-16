@@ -28,8 +28,10 @@ router.post(
 
 router.get("/current", authenticate, ctrl.currentUser);
 
+router.get(
+  "/verify/:verificationToken",
+  ctrl.verifyEmail
+);
 
-
-// GET /auth/verify/:verificationToken
 
 module.exports = router;

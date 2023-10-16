@@ -5,7 +5,12 @@ const gravatar = require("gravatar");
 const { nanoid } = require("nanoid");
 
 const { User } = require("../models/user");
-const { HttpError, ctrlWrapper, sendEmail } = require("../utils");
+const {
+  HttpError,
+  ctrlWrapper,
+  sendEmail,
+} = require("../utils");
+const { findByIdAndUpdate } = require("../models/contact");
 
 const { SECRET_KEY, BASE_URL } = process.env;
 
@@ -42,6 +47,24 @@ const registerUser = ctrlWrapper(async (req, res) => {
   });
 });
 
+const verifyEmail = ctrlWrapper(async (req, res) => {
+  const { verificationToken } = req.params;
+
+  const result = await User.findOne({ verificationToken });
+
+  if (!result) {
+    throw HttpError(404, "User not found");
+  }
+  await User.findByIdAndUpdate(result.id, {
+    verify: true,
+    verificationToken: null,
+  });
+
+  res
+    .status(200)
+    .json({ message: "Verification successful" });
+});
+
 const loginUser = ctrlWrapper(async (req, res) => {
   const { email, password } = req.body;
 
@@ -57,6 +80,10 @@ const loginUser = ctrlWrapper(async (req, res) => {
 
   if (!passwordCompare) {
     throw HttpError(401, "Email or password is wrong");
+  }
+
+  if (!result.verify) {
+    throw HttpError(401, "Verify email");
   }
 
   const payload = { id: result._id };
@@ -101,4 +128,5 @@ module.exports = {
   loginUser,
   logoutUser,
   currentUser,
+  verifyEmail,
 };
