@@ -1,25 +1,44 @@
 const Contact = require("../models/contact");
 const { HttpError, ctrlWrapper } = require("../utils");
 
-const getAllContacts = async (req, res, ) => {
+const getAllContacts = async (req, res) => {
   const { id: owner } = req.user;
-  const { favorite, page = 1, limit = 20 } = req.query;
-  console.log(page, limit, favorite);
-  const skip = (page - 1) * limit;
+  const { favorite } = req.query;
 
-  if (favorite !== undefined) {
+  const pag = Number(req.query.page);
+
+  let page = 1;
+  if (
+    !Number.isNaN(pag) &&
+    req.query.page !== "" &&
+    pag !== 0
+  ) {
+    page = req.query.page;
+  } 
+
+  const lim = Number(req.query.limit);
+
+  let limit = 20;
+  if (
+    !Number.isNaN(lim) &&
+    req.query.limit !== "" &&
+    lim !== 0
+  ) {
+    limit = req.query.limit;
+  }
+
+  if (favorite === "true" || favorite === "false") {
+    const skip = (page - 1) * limit;
     const result = await Contact.find(
       { owner, favorite },
       "-secondArg",
       { skip, limit }
-    ).populate("owner", "email");
+    ).populate("owner", "email subscription");
     res.status(200).json(result);
     return;
   }
 
-  // скіп і ліміт не хоче працювати без другого аргументу,
-  // зробив ось таку заглушку "-secondArg"
-  
+  const skip = (page - 1) * limit;
   const result = await Contact.find(
     { owner },
     "-secondArg",
@@ -27,9 +46,10 @@ const getAllContacts = async (req, res, ) => {
       skip,
       limit,
     }
-  ).populate("owner", "email");
+  ).populate("owner", "email subscription");
   res.status(200).json(result);
 };
+
 
 const getContactById = ctrlWrapper(
   async (req, res, next) => {
@@ -43,6 +63,7 @@ const getContactById = ctrlWrapper(
   }
 );
 
+
 const addContact = ctrlWrapper(async (req, res, next) => {
   const { id: owner } = req.user;
   const result = await Contact.create({
@@ -51,6 +72,7 @@ const addContact = ctrlWrapper(async (req, res, next) => {
   });
   res.status(201).json(result);
 });
+
 
 const delContactById = ctrlWrapper(
   async (req, res, next) => {
@@ -66,6 +88,7 @@ const delContactById = ctrlWrapper(
   }
 );
 
+
 const updateContactById = ctrlWrapper(
   async (req, res, next) => {
     const { contactId } = req.params;
@@ -80,6 +103,7 @@ const updateContactById = ctrlWrapper(
     res.status(200).json(result);
   }
 );
+
 
 const updateFavorite = ctrlWrapper(
   async (req, res, next) => {

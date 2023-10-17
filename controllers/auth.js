@@ -10,7 +10,6 @@ const {
   ctrlWrapper,
   sendEmail,
 } = require("../utils");
-const { findByIdAndUpdate } = require("../models/contact");
 
 const { SECRET_KEY, BASE_URL } = process.env;
 
@@ -47,6 +46,7 @@ const registerUser = ctrlWrapper(async (req, res) => {
   });
 });
 
+
 const verifyEmail = ctrlWrapper(async (req, res) => {
   const { verificationToken } = req.params;
 
@@ -65,6 +65,31 @@ const verifyEmail = ctrlWrapper(async (req, res) => {
     .json({ message: "Verification successful" });
 });
 
+
+const resendVerifyEmail = ctrlWrapper(async (req, res) => {
+  const { email } = req.body;
+
+  const result = await User.findOne({ email });
+  
+  if (!result) {
+    throw HttpError(400, "Email not found")
+  }
+  if (result.verify) {
+  throw HttpError(400, "Verification has already been passed");
+}
+    const verifyEmail = {
+      to: email,
+      subject: "Verify email",
+      html: `<a target="_blank" href="${BASE_URL}/api/auth/verify/${result.verificationToken}">Click to verify email</a>`,
+    };
+
+    await sendEmail(verifyEmail);
+
+  res.status(200).json({ message: "Verification email sent" })
+  
+})
+
+
 const loginUser = ctrlWrapper(async (req, res) => {
   const { email, password } = req.body;
 
@@ -77,27 +102,23 @@ const loginUser = ctrlWrapper(async (req, res) => {
     password,
     result.password
   );
-
   if (!passwordCompare) {
     throw HttpError(401, "Email or password is wrong");
   }
-
   if (!result.verify) {
     throw HttpError(401, "Verify email");
   }
-
-  const payload = { id: result._id };
+  const payload = { id: result.id };
 
   const token = jwt.sign(payload, SECRET_KEY, {
     expiresIn: "23h",
   });
 
   await User.findByIdAndUpdate(
-    result._id,
+    result.id,
     { token }
     // { new: true }
   );
-
   res.status(200).json({
     token,
     user: {
@@ -129,4 +150,5 @@ module.exports = {
   logoutUser,
   currentUser,
   verifyEmail,
+  resendVerifyEmail,
 };

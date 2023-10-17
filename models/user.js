@@ -59,10 +59,15 @@ const userChangeSubscriptionSchema = Joi.object({
     .required(),
 }).options({ abortEarly: false });
 
+const userResendVerifyEmailSchema = Joi.object({
+  email: Joi.string().pattern(emailRegexp).required(),
+});
+
 const schemas = {
   userRegisterSchema,
   userLoginSchema,
   userChangeSubscriptionSchema,
+  userResendVerifyEmailSchema,
 };
 
 userSchema.post("save", (error, data, next) => {

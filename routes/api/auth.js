@@ -33,5 +33,6 @@ router.get(
   ctrl.verifyEmail
 );
 
+router.post("/verify", validateContactBody(schemas.userResendVerifyEmailSchema), ctrl.resendVerifyEmail);
 
 module.exports = router;
