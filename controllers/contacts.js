@@ -84,7 +84,7 @@ const delContactById = ctrlWrapper(
     if (!result) {
       throw HttpError(404, "Not found");
     }
-    res.status(201).json({ message: "contact deleted" });
+    res.status(200).json({ message: "contact deleted" });
   }
 );
 
